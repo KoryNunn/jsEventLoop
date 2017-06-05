@@ -1,0 +1,104 @@
+<link rel="stylesheet" href="./node_modules/highlight.js/styles/default.css">
+<script type="text/javascript" src="index.browser.js"></script>
+<link rel="stylesheet" type="text/css" href="index.css">
+
+<section>
+    <h1>JS Event loop</h1>
+
+    <h3>How Javascript does async when Javascript isnt async.</h3>
+</section>
+
+<section>
+    <h1>JS executes synchronously</h1>
+
+    <h3>No smart scheduling</h3>
+
+    <h3>Runs until the stack is gone.</h3>
+</section>
+
+<section>
+    <h1>JS Doesn't do a lot</h1>
+
+    <h3>JS is like a manager</h3>
+
+    <h3>Delegation, Delegation, Delegation...</h3>
+
+    <h1>The runtime does a lot</h1>
+
+    <h3>fs.readFile, http.listen, etc, etc</h3>
+</section>
+
+<section>
+
+    <pre><code class="javascript">
+console.log('Starting'); // < -- statement 1 pushed onto stack
+
+// < -- statement 2 pushed onto stack
+// < -- event registered on completion of fs.readFile
+fs.readFile('myFile.txt', 'utf8', function(error, file){
+    console.log("Done");
+});
+
+console.log('Stack done'); // < -- statement 3 pushed onto stack
+
+// One event in the event loop queue, JS engine waits.
+
+// ... later ...
+
+// fs call completes, the callback is run, "Done" logs.
+    </code></pre>
+</section>
+
+<section>
+    <h1>First class functions are great!</h1>
+
+    <h2>No need for horrific "async/await" hack syntax like other languages..</h2>
+
+    <h2>No need for external async queue runners (gearman etc)</h2>
+</section>
+
+<section>
+
+    <pre><code class="javascript">
+eventQueue = []
+
+fs.readFile = function(fileName, options, callback){
+    error or file = readTheFile(fileName, options)
+
+    eventQueue.push(() => callback(error, file))
+}
+
+runSource(mainProgram)
+
+function run(nextStack){
+    nextStack();
+
+    if(eventQueue.length){
+        run(eventQueue.shift())
+    }
+}
+    </code></pre>
+</section>
+
+<section>
+
+    <pre><code class="javascript">
+async function (){
+    var x = await foo();
+    var y = await bar();
+
+    return x + y;
+}
+    </code></pre>
+</section>
+
+<section>
+
+    <h2>END.<h2>
+
+    <a href="https://twitter.com/korynunn">@korynunn</a>
+    <a href="https://github.com/korynunn">github/korynunn</a>
+
+    <p>PS: I like cars.</p>
+
+</section>

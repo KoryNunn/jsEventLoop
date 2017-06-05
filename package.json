@@ -1,0 +1,17 @@
+{
+  "name": "jsEventLoop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "watchify ./index.js -o ./index.browser.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "highlight": "^0.2.4",
+    "highlight.js": "^9.12.0",
+    "keycode": "^2.1.8"
+  }
+}
