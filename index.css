@@ -78,4 +78,6 @@ pre{
 	width: 80%;
 	min-width: 1600px;
 	margin: 20px auto;
+	max-height: 100%;
+	overflow-y: auto;
 }

@@ -5,13 +5,13 @@
 <section>
     <h1>JS Event loop</h1>
 
-    <h3>How Javascript does async when Javascript isnt async.</h3>
+    <h3>How Javascript does async when Javascript isn't async.</h3>
 </section>
 
 <section>
     <h1>JS executes synchronously</h1>
 
-    <h3>No smart scheduling</h3>
+    <h3>No smart scheduling.</h3>
 
     <h3>Runs until the stack is gone.</h3>
 </section>
@@ -60,27 +60,87 @@ console.log('Stack done'); // < -- statement 3 pushed onto stack
 <section>
 
     <pre><code class="javascript">
+asyncStuffRunning = 0
 eventQueue = []
 
-fs.readFile = function(fileName, options, callback){
-    error or file = readTheFile(fileName, options)
-
-    eventQueue.push(() => callback(error, file))
+function asyncStarted(){
+    asyncStuffRunning++
 }
 
-runSource(mainProgram)
+function asyncComplete(stack){
+    asyncStuffRunning--
+    eventQueue.push(stack)
+}
 
-function run(nextStack){
-    nextStack();
+execute(mainProgram)
 
+function loop(){
     if(eventQueue.length){
-        run(eventQueue.shift())
+        execute(eventQueue.shift())
+        return loop()
     }
+
+    if(asyncStuffRunning){
+        return loop()
+    }
+
+    exit()
+}
+loop();
+    </code></pre>
+</section>
+
+<section>
+
+    <pre><code class="javascript">
+function readFile(filePath, options, callback){
+    asyncStarted()
+
+    error or file = actualFileSystemRead(filePath, options)
+
+    asyncComplete(function(){
+        callback(error, file)
+    })
 }
     </code></pre>
 </section>
 
 <section>
+
+    <pre><code class="javascript">
+function setTimeout(callback, time){
+    asyncStarted()
+
+    // (wait for time)
+
+    asyncComplete(function(){
+        callback()
+    })
+}
+    </code></pre>
+</section>
+
+<section>
+
+    <pre><code class="javascript">
+function httpListen(handler){
+    asyncStarted()
+
+    onNetworkRequest(function(request){
+        asyncComplete(function(){
+            handler(request, new Response())
+        })
+
+        asyncStarted()
+    })
+}
+    </code></pre>
+</section>
+
+<section>
+    <h1>Async await</h1>
+
+    <h2>JS executes in a completely different way to usual</h2>
 
     <pre><code class="javascript">
 async function (){
@@ -98,7 +158,5 @@ async function (){
 
     <a href="https://twitter.com/korynunn">@korynunn</a>
     <a href="https://github.com/korynunn">github/korynunn</a>
-
-    <p>PS: I like cars.</p>
 
 </section>
